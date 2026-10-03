@@ -85,3 +85,6 @@ desktop.ini
 *.db
 *.pid
 *.seed
+
+# 校验脚本生成的临时 bundle
+scripts/verify-bundle.mjs

@@ -85,13 +85,18 @@ const meta = moduleMeta('protectiondevice')
 const columns = ["装置编号", "所属间隔", "装置型号", "保护类型", "投运日期", "校验周期", "上次校验日", "装置状态"]
 const actions = ["登记运行", "完成校验", "提出更换"]
 const statuses = ["待校验", "运行正常", "已校验", "需更换"]
-const stats = [{"label": "运行正常装置", "value": 0}, {"label": "待校验装置", "value": 0}, {"label": "需更换装置", "value": 0}]
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
 const errorMessage = ref('')
 const filters = ref<Record<string, string>>({})
 const filterFields = columns.slice(0, 3)
+// 保护校验判不合格会把装置回写到待校验清单，这里按实际数据计数。
+const stats = computed(() => [
+  { label: "运行正常装置", value: rows.value.filter((row) => String(row.status) === "运行正常").length },
+  { label: "待校验装置", value: rows.value.filter((row) => String(row.status) === "待校验").length },
+  { label: "需更换装置", value: rows.value.filter((row) => String(row.status) === "需更换").length },
+])
 const statusSummary = computed(() =>
   statuses.map((status: string) => ({
     status,
