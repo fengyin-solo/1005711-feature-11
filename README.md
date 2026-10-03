@@ -47,7 +47,7 @@ npm run build
 | 定值整定 | `settingvalue` | 定值单 | 定值单号、所属装置、定值项目 |
 | 定值核对 | `settingcheck` | 核对记录 | 核对编号、所属变电站、装置名称 |
 | 二次回路检查 | `secondarycircuit` | 回路检查记录 | 检查编号、所属间隔、回路类别 |
-| 保护校验 | `relaytest` | 校验记录 | 校验编号、装置名称、校验项目 |
+| 保护校验 | `relaytest` | 校验记录 | 校验编号、装置编号、装置名称、校验项目、动作值、返回值 |
 | 故障录波 | `faultrecord` | 录波记录 | 录波编号、故障线路、故障类型 |
 | 保护动作统计 | `tripstat` | 动作统计 | 统计编号、所属线路、动作次数 |
 | 主变检修 | `transformermaint` | 主变检修记录 | 检修编号、主变名称、检修类别 |
@@ -68,4 +68,20 @@ npm run build
 - 字段、状态、动作与流转目标集中在 `frontend/src/data/modules.ts`；示例数据在
   `frontend/src/data/seed.ts`。
 - 状态流转只允许在 `local-service.ts` 里改，页面组件不做业务判断。
-- 想回到初始数据：清掉浏览器里 `substation-protection:entries` 这一项，或调用 `resetModule(模块)`。
+- 保护校验的专用口径集中在 `frontend/src/data/relay-spec.ts`（校验项目技术要求、缺值与超范围
+  判定）与 `frontend/src/data/relay-service.ts`（登记去重、判定回写台账、导出核对）；列表格内
+  编辑与详情面板共用同一套校验函数，口径不分裂。
+- 想回到初始数据：清掉浏览器里 `substation-protection:entries:v2` 这一项，或调用 `resetModule(模块)`。
+
+## 保护校验的冒烟测试
+
+纯前端逻辑用 esbuild 打包后在 Node 下跑（需先 `npm install`，并装好本机平台的
+`@esbuild/<平台>` 可选依赖）：
+
+```bash
+cd frontend
+node -e "const e=require('esbuild');e.build({entryPoints:['scripts/smoke-entry.ts'],bundle:true,platform:'node',format:'esm',outfile:'/tmp/smoke.mjs'})" && node /tmp/smoke.mjs
+```
+
+覆盖：缺值照常列出且标明缺格、超技术要求挡回保存、同装置去重、不合格回写台账待校验清单、
+导出失败明细与可续导。
